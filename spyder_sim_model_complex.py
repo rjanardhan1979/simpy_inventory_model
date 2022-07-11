@@ -1,7 +1,9 @@
-import simpy
+#import packages
 
+import simpy
 import numpy as np
 
+#set random seed
 np.random.seed(0)
 
 class invSim:
@@ -16,14 +18,23 @@ class invSim:
         self.order_history = [0]
         self.ssl_history = [self.ssl]
         
+        #ssl = safety stock level
+        #invMax = Max inventory policy
+        #inventory = inventory on hand. initial value is invMax
+        #open_order = open orders to supplier. initial value is zero. only gets triggered when inventory drops below safety stock
+        #history variables are lists to record values at each env.now
+        
+        
         
         print(f'{self.inventory} at time {env.now: .2f}')
         self.env.process(self.customer_event(self.env))
         
     def customer_event(self, env):
-        while True:     
+        while True:   
+            #set customer interarrival. 5 customers per day
             self.interarrival = np.random.exponential(1./5.)            
-            yield self.env.timeout(self.interarrival)            
+            yield self.env.timeout(self.interarrival)  
+            #set demand per customer, 1-5 units per customer ordered.
             self.demand = np.random.randint(1,5)
             
             if self.demand <= self.inventory:
