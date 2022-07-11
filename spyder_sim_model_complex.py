@@ -70,7 +70,7 @@ def run(ssl:float, invMax:float):
     env = simpy.Environment()
     inv = invSim(env, ssl, invMax)
     inv.env.run(30)
-    
+    #calculate % of time product was backordered
     x = np.array(inv.inventory_history)
     print(f'{x[x==0].size / x.size: .1%}')
 
