@@ -58,9 +58,12 @@ class invSim:
                 self.open_order += self.invMax - self.inventory
                 self.order_history.append(self.open_order)
                 print(f'{self.open_order} placed at time {env.now}')
+                print(f'x-{self.inventory} at time {env.now: .2f}')
                 yield self.env.timeout(2)
                 print(f'{self.open_order} received at time {env.now}')
-                self.inventory += self.open_order                
+                
+                self.inventory += self.open_order 
+                print(f'x-{self.inventory} at time {env.now: .2f}')
                 self.open_order = 0                
    
 import matplotlib.pyplot as plt
@@ -73,6 +76,7 @@ def run(ssl:float, invMax:float):
     #calculate % of time product was backordered
     x = np.array(inv.inventory_history)
     print(f'{x[x==0].size / x.size: .1%}')
+    print(inv.inventory_history[10])
 
     plt.figure()
     plt.step(inv.time_history, inv.inventory_history, where='post')
