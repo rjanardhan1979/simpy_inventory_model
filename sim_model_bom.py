@@ -1,10 +1,15 @@
-#import packages
+# import packages
 
 import simpy
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
-import pandas as pd
+import warnings
+import openpyxl
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    import pandas as pd
 
 # set random seed
 np.random.seed(0)
@@ -88,6 +93,7 @@ class invSim:
         self.item_inventory[i]['open_order'] = self.OO[i]['open_order']
         yield env.timeout(self.item_inventory[i]['lt'])
         self.item_inventory[i]['item_inventory'] += self.OO[i]['open_order']
+        self.item_inventory[i]['open_order'] = 0
         self.item_inventory[i]['backOrder'] = 0
         self.OO[i]['open_order'] = 0
 
@@ -114,13 +120,30 @@ class invSim:
 
 
 def run(invMax, OO):
+    meta = []
     env = simpy.Environment()
     inv = invSim(env, invMax, OO)
     env.process(inv.observe(env))
     env.run(until=30)
 
-    for i in range(len(INV_LEVEL)):
-        print(OBS_TIME[i], INV_LEVEL[i][0])
+    for index, item in enumerate(INV_LEVEL):
+        for subitem in item:
+            subitem['time'] = OBS_TIME[index]
+            subitem['bike_inventory'] = BIKES[index]
+
+    df = pd.DataFrame()
+
+    for index, item in enumerate(INV_LEVEL):
+        for j in range(6):
+            df_inv = pd.DataFrame(item[j], index=[(index*6)+(j)])
+            df = pd.concat([df, df_inv])
+
+    writer = pd.ExcelWriter('output.xlsx')
+    # write dataframe to excel
+    df.to_excel(writer)
+    # save the excel
+    writer.save()
+    print('DataFrame is written successfully to Excel File.')
 
     plt.figure()
     plt.step(inv.time_history, inv.bike_history, where='post')
