@@ -144,6 +144,7 @@ def run(invMax, OO):
     # save the excel
     writer.save()
     print('DataFrame is written successfully to Excel File.')
+    return [df, INV_LEVEL]
 
     plt.figure()
     plt.step(inv.time_history, inv.bike_history, where='post')
@@ -153,3 +154,7 @@ def run(invMax, OO):
 
 if __name__ == '__main__':
     (run(INV, OPEN_ORDER))
+
+def callprocess():
+    return (run(INV, OPEN_ORDER))
+
